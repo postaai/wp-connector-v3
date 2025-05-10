@@ -7,7 +7,8 @@ const env = environment();
 export const createSocketClient = (orgId: string) => {
   console.log(chalk.blue(chalk.bold("Creating socket client...")));
   const socket = io(env.SERVER_URL, {
-    reconnection: false,
+    reconnection: true,
+    reconnectionDelay: 1000,
     query: {
       orgId,
     },

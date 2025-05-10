@@ -71,10 +71,8 @@ export const handleReciveBotMessage = async (payload: BotMessage) => {
     }
     const { data: messageData } = message;
 
-    const { type, content, userId } = messageData;
-    if (type === "audio") {
-      return;
-    }
+    const { content, userId } = messageData;
+
     console.log(
       chalk.bold(
         chalk.green(`Message received to ${userId} -> `),

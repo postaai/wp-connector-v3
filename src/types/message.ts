@@ -1,21 +1,14 @@
 import { z } from "zod";
 
-export const MessageSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("text"),
-    userId: z.string(),
-    orgId: z.string(),
-    content: z.string(),
-    timestamp: z.number().default(() => Date.now()),
-  }),
-  z.object({
-    type: z.literal("audio"),
-    userId: z.string(),
-    orgId: z.string(),
-    content: z.instanceof(Buffer),
-    timestamp: z.number().default(() => Date.now()),
-  }),
-]);
+export const MessageSchema = z.object({
+  userId: z.string(),
+  orgId: z.string(),
+  content: z.string(),
+  contactName: z.string().optional(),
+  timestamp: z.number().default(() => Date.now()),
+});
+
+export type Message = z.infer<typeof MessageSchema>;
 
 export type BotMessage = z.infer<typeof MessageSchema>;
 

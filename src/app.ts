@@ -9,6 +9,8 @@ import {
   handleReciveBotTyping,
   handleReciveWhatsappMessage,
 } from "./controllers/message.controller";
+import { app } from "./server/express";
+import { Sumary, SumarySchema } from "./types/sumary";
 
 const env = environment();
 
@@ -61,6 +63,51 @@ const main = async () => {
   whatsapp.initialize().then(() => {
     console.log(`${chalk.green(chalk.bold("Whatsapp is ready! 💬"))}`);
   });
+
+  app.post("/send-sumary", async (req, res) => {
+    try {
+      const { body } = req;
+
+      const sumaryParse = SumarySchema.safeParse(body);
+
+      if (!sumaryParse.success) {
+        return res.status(400).json({
+          message: "Invalid sumary",
+          error: sumaryParse.error.format(),
+        });
+      }
+      const { data: sumaryData } = sumaryParse;
+
+      console.log(sumaryData);
+
+      const contactsToSendSumary = env.CONTACTS_TO_SEND_SUMARY.split(",");
+
+      for (const contact of contactsToSendSumary) {
+        const chatId = contact.trim();
+        const message = `*Novo cliente encontrado*\n*Contato*:${sumaryData.userId}\n\n${sumaryData.text}`;
+        if (sumaryData.userId && sumaryData.finishMessage) {
+          await whatsapp.sendMessage(
+            sumaryData.userId,
+            sumaryData.finishMessage
+          );
+        }
+        await whatsapp.sendMessage(chatId, message);
+      }
+
+      return res.status(200).send({ ok: true });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Error sending summary",
+        error: error.message,
+      });
+    }
+  });
+
+  app.listen(env.HTTP_PORT, () =>
+    console.log(
+      chalk.bold(chalk.green(`Server is running on ${env.HTTP_PORT} 🚀`))
+    )
+  );
 };
 
 main()

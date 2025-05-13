@@ -4,6 +4,8 @@ import { z } from "zod";
 export const envSchema = z.object({
   SERVER_URL: z.string().min(1),
   ORG_ID: z.string().min(1),
+  HTTP_PORT:z.string().min(1),
+  CONTACTS_TO_SEND_SUMARY: z.string().min(1),
 });
 
 export default function environment() {

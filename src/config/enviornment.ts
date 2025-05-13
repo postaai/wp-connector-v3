@@ -6,6 +6,7 @@ export const envSchema = z.object({
   ORG_ID: z.string().min(1),
   HTTP_PORT:z.string().min(1),
   CONTACTS_TO_SEND_SUMARY: z.string().min(1),
+  AUDIO_PROCESSOR_API_URL: z.string().min(1),
 });
 
 export default function environment() {

@@ -9,6 +9,7 @@ import {
   MessageSchema,
   TypingPayloadSchema,
 } from "../types/message";
+import { handleReciveVoiceMessage } from "../services/audio-processor.service";
 
 const env = environment();
 
@@ -17,11 +18,12 @@ export const handleReciveWhatsappMessage = async (
   socoket: Socket
 ) => {
   try {
+    const isVoice = message.type === MessageTypes.VOICE;
+
     if (
       message.type === MessageTypes.VIDEO ||
       message.type === MessageTypes.IMAGE ||
-      message.type === MessageTypes.AUDIO ||
-      message.type === MessageTypes.VOICE
+      message.type === MessageTypes.AUDIO
     ) {
       whatsapp.sendMessage(
         message.from,
@@ -40,7 +42,13 @@ export const handleReciveWhatsappMessage = async (
       "";
 
     const userId = message.from;
-    const messageContent = message.body;
+    var messageContent: string;
+
+    if (isVoice) {
+      messageContent = await handleReciveVoiceMessage(message, env.ORG_ID);
+    } else {
+      messageContent = message.body;
+    }
 
     const messagePayload = {
       type: "text",

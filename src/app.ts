@@ -85,15 +85,12 @@ const main = async () => {
       for (const contact of contactsToSendSumary) {
         const chatId = contact.trim();
         const message = `*Novo cliente encontrado*\n*Contato*:${sumaryData.userId}\n\n${sumaryData.text}`;
-        if (sumaryData.userId && sumaryData.finishMessage) {
-          await whatsapp.sendMessage(
-            sumaryData.userId,
-            sumaryData.finishMessage
-          );
-        }
         await whatsapp.sendMessage(chatId, message);
       }
 
+      if (sumaryData.userId && sumaryData.finishMessage) {
+        await whatsapp.sendMessage(sumaryData.userId, sumaryData.finishMessage);
+      }
       return res.status(200).send({ ok: true });
     } catch (error: any) {
       return res.status(500).json({

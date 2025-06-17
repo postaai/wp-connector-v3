@@ -11,6 +11,7 @@ import {
 } from "./controllers/message.controller";
 import { app } from "./server/express";
 import { Sumary, SumarySchema } from "./types/sumary";
+import { delay } from "./utils/delay";
 
 const env = environment();
 
@@ -89,7 +90,23 @@ const main = async () => {
       }
 
       if (sumaryData.userId && sumaryData.finishMessage) {
-        await whatsapp.sendMessage(sumaryData.userId, sumaryData.finishMessage);
+        const splitedMessage = sumaryData.finishMessage.split("[FIM_MENSAGEM]");
+        const chat = await whatsapp.getChatById(sumaryData.userId);
+        if (!chat) {
+          return res.status(404).json({
+            message: "Chat not found",
+          });
+        }
+        for (const message of splitedMessage) {
+          if (message.trim()) {
+            chat.sendStateTyping();
+            const delayTime = Math.min(900 + message.trim().length * 15, 3000);
+            await delay(delayTime);
+            await whatsapp.sendMessage(sumaryData.userId, message.trim());
+            chat.clearState();
+            //await whatsapp.sendMessage(sumaryData.userId, sumaryData.finishMessage);
+          }
+        }
       }
       return res.status(200).send({ ok: true });
     } catch (error: any) {

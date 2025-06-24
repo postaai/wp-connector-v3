@@ -85,7 +85,8 @@ const main = async () => {
 
       for (const contact of contactsToSendSumary) {
         const chatId = contact.trim();
-        const message = `*Novo cliente encontrado*\n*Contato*:${sumaryData.userId}\n\n${sumaryData.text}`;
+        const userId = sumaryData.userId.replace("@c.us", "");
+        const message = `*Novo cliente encontrado*\n*Contato*:${userId}\n\n${sumaryData.text}`;
         await whatsapp.sendMessage(chatId, message);
       }
 
